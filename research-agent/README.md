@@ -139,8 +139,3 @@ It will wait for stdio MCP traffic; press `Ctrl+C` to exit.
 
 ---
 
-## Team Contributions
-
-- **Team Member 1** — LangGraph workflow design and agent node implementation.
-- **Team Member 2** — MCP server, SQLite schema, and tool definitions.
-- **Team Member 3** — Configuration, CLI entry point, testing, and documentation.
