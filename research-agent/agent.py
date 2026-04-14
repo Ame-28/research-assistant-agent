@@ -7,10 +7,9 @@ Pipeline:
 from datetime import datetime, timezone
 
 from langchain_core.messages import HumanMessage, SystemMessage
+from langchain_mcp_adapters.client import MultiServerMCPClient
 from langchain_openai import ChatOpenAI
 from langgraph.graph import END, StateGraph
-from mcp import ClientSession, StdioServerParameters
-from mcp.client.stdio import stdio_client
 from tavily import TavilyClient
 from typing_extensions import TypedDict
 
@@ -114,33 +113,36 @@ async def summarize_node(state: ResearchState) -> dict:
 
 
 async def store_node(state: ResearchState) -> dict:
-    """Persist the research via the MCP server's save_research tool."""
-    server_params = StdioServerParameters(
-        command="python",
-        args=["mcp_server.py"],
-    )
+    """Persist the research via the MCP server's save_research tool.
 
+    Uses langchain-mcp-adapters to bridge the MCP server into LangChain
+    tools, so the agent interacts with it through the same BaseTool
+    interface as any other LangChain tool.
+    """
     try:
-        async with stdio_client(server_params) as (read, write):
-            async with ClientSession(read, write) as session:
-                await session.initialize()
+        client = MultiServerMCPClient(
+            {
+                "research": {
+                    "command": "python",
+                    "args": ["mcp_server.py"],
+                    "transport": "stdio",
+                }
+            }
+        )
+        tools = await client.get_tools()
+        save_tool = next((t for t in tools if t.name == "save_research"), None)
+        if save_tool is None:
+            return {"status": "MCP storage failed: save_research tool not found"}
 
-                result = await session.call_tool(
-                    "save_research",
-                    arguments={
-                        "title": state["query"],
-                        "summary": state["summary"],
-                        "sources": state["sources"],
-                        "timestamp": datetime.now(timezone.utc).isoformat(),
-                    },
-                )
-
-                status_text = (
-                    result.content[0].text
-                    if getattr(result, "content", None)
-                    else "Saved successfully"
-                )
-                return {"status": status_text}
+        status_text = await save_tool.ainvoke(
+            {
+                "title": state["query"],
+                "summary": state["summary"],
+                "sources": state["sources"],
+                "timestamp": datetime.now(timezone.utc).isoformat(),
+            }
+        )
+        return {"status": str(status_text) if status_text else "Saved successfully"}
     except Exception as exc:
         return {"status": f"MCP storage failed: {exc}"}
 

@@ -131,7 +131,8 @@ It will wait for stdio MCP traffic; press `Ctrl+C` to exit.
 | `langgraph` | Defines the 4-node research workflow (state graph). |
 | `langchain-openai` | `ChatOpenAI` wrapper used by `summarize_node`. |
 | `langchain-core` | Message primitives (`SystemMessage`, `HumanMessage`). |
-| `mcp` | Model Context Protocol SDK — FastMCP server + stdio client. |
+| `mcp` | Model Context Protocol SDK — FastMCP server. |
+| `langchain-mcp-adapters` | Bridges the MCP server's tools into LangChain `BaseTool` objects used by `store_node`. |
 | `tavily-python` | Tavily web search API client used by `search_node`. |
 | `pydantic` / `pydantic-settings` | Typed settings loaded from `.env`. |
 | `python-dotenv` | Loads environment variables at startup. |
