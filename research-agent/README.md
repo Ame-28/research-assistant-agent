@@ -1,5 +1,7 @@
 # Research Assistant Agent
 
+**Repository:** https://github.com/Ame-28/research-assistant-agent
+
 AI agent built with **LangGraph** that accepts a research topic from the user, searches the web using **Tavily**, extracts and cleans the returned content, summarizes it with an **OpenAI LLM**, and stores the structured research note in a **SQLite** database through a **Model Context Protocol (MCP)** server.
 
 ---
@@ -110,7 +112,7 @@ The MCP server (`mcp_server.py`) uses the FastMCP high-level API and communicate
 
 | Tool | Parameters | Returns | Purpose |
 |------|------------|---------|---------|
-| `save_research` | `title: str`, `summary: str`, `sources: str` (JSON array), `timestamp: str` (ISO 8601) | Confirmation string | Inserts a research entry into SQLite. |
+| `save_research` | `title: str`, `summary: str`, `sources: list[str]`, `timestamp: str` (ISO 8601) | Confirmation string | Inserts a research entry into SQLite (sources stored as a JSON array). |
 | `list_research` | *(none)* | Formatted text of all entries, or a "no entries" message | Lists every saved research entry. |
 | `search_research` | `keyword: str` | Matching entries or a "no matches" message | Case-insensitive keyword search over title and summary. |
 
@@ -137,6 +139,14 @@ It will wait for stdio MCP traffic; press `Ctrl+C` to exit.
 | `pydantic` / `pydantic-settings` | Typed settings loaded from `.env`. |
 | `python-dotenv` | Loads environment variables at startup. |
 | `sqlite3` (stdlib) | Local persistence for research entries. |
+
+---
+
+## Team Contributions
+
+This project was completed solo.
+
+ Amel-Sole contributor: LangGraph workflow design, MCP server implementation, SQLite integration, configuration, CLI, and documentation.
 
 ---
 
